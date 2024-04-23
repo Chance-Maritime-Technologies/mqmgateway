@@ -127,6 +127,12 @@ ModbusPoller::handleRegisterReadError(int slaveId, RegisterPoll& regPoll, const 
         MsgRegisterReadFailed msg(slaveId, regPoll.mRegisterType, regPoll.mRegister, regPoll.getCount());
         sendMessage(QueueItem::create(msg));
     }
+
+    // TODO(disconnect-after-read-failure-hack): Replace this with something generic/configurable
+    if (regPoll.mReadErrors > RegisterPoll::DefaultReadErrorCount * 3) {
+        BOOST_LOG_SEV(log, Log::error) << (RegisterPoll::DefaultReadErrorCount * 3) << " Read Errors!... dropping connection";
+        mModbus->disconnect();
+    }
 }
 
 std::chrono::steady_clock::duration
