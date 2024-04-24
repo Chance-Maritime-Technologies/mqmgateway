@@ -8,7 +8,8 @@ namespace modmqttd {
 ModbusPoller::ModbusPoller(moodycamel::BlockingReaderWriterQueue<QueueItem>& fromModbusQueue)
     : mFromModbusQueue(fromModbusQueue),
       mCurrentSlave(0),
-      mLastSlave(0)
+      mLastSlave(0),
+      mAlwaysSend(true)
 {}
 
 void
@@ -97,7 +98,7 @@ ModbusPoller::pollRegister(int slaveId, const std::shared_ptr<RegisterPoll>& reg
         BOOST_LOG_SEV(log, Log::debug) << "Register " << slaveId << "." << reg.mRegister << " (0x" << std::hex << slaveId << ".0x" << std::hex << reg.mRegister << ")"
                         << " polled in "  << std::dec << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms";
 
-        if ((reg.getValues() != newValues) || forceSend || (reg.mReadErrors != 0)) {
+        if ((reg.getValues() != newValues) || forceSend || mAlwaysSend || (reg.mReadErrors != 0)) {
             MsgRegisterValues val(slaveId, reg.mRegisterType, reg.mRegister, newValues);
             sendMessage(QueueItem::create(val));
             reg.update(newValues);

@@ -45,6 +45,7 @@ class ModbusPoller {
         int mLastSlave;
         std::shared_ptr<RegisterPoll> mWaitingRegister;
         bool mInitialPoll;
+        bool mAlwaysSend;
         std::chrono::time_point<std::chrono::steady_clock> mPollStart;
 
         void pollRegister(int slaveId, const std::shared_ptr<RegisterPoll>& reg_ptr, bool forceSend);

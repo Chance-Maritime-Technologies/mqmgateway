@@ -141,8 +141,10 @@ MqttClient::processRegisterValues(const std::string& modbusNetworkName, const Ms
         for(int regNumber = slaveData.mRegisterNumber; regNumber < lastRegister; regNumber++) {
             ident.mRegisterNumber = regNumber;
             uint16_t value = slaveData.mRegisters.getValue(regIndex++);
-            if (!obj.updateRegisterValue(ident, value))
-                continue;
+
+            //if (!obj.updateRegisterValue(ident, value))
+            //        continue;
+            (void) obj.updateRegisterValue(ident, value);
 
             modified[&obj] = oldAvail;
         }
